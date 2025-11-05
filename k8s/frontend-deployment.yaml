@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notes-frontend
+  template:
+    metadata:
+      labels:
+        app: notes-frontend
+    spec:
+      containers:
+      - name: notes-frontend
+        image: YOUR_DOCKERHUB_USERNAME/notes-frontend:latest
+        ports:
+        - containerPort: 80
+        # Agar frontend ichidan backendga host orqali murojaat qilish kerak bo'lsa,
+        # container args yoki configmap orqali window.API_URL o'rnatish mumkin (soddaligi uchun qoldirmayapmiz).
+---
+# Frontend uchun NodePort service (tashqi worldga chiqarish)
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes-frontend
+spec:
+  selector:
+    app: notes-frontend
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080   # tashqi port: bu misolda 30080
