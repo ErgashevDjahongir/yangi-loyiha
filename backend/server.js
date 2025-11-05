@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-const mongoUrl = process.env.MONGO_URL || 'mongodb://mongo:27017';
+const mongoUrl = process.env.MONGO_URL || 'mongodb://10.98.34.34:27017';
 const dbName = 'notesdb';
 
 let db;
