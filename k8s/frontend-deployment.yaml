@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: notes-frontend
-        image: YOUR_DOCKERHUB_USERNAME/notes-frontend:latest
+        image: djahongir/notes-frontend:latest
         ports:
         - containerPort: 80
         # Agar frontend ichidan backendga host orqali murojaat qilish kerak bo'lsa,
