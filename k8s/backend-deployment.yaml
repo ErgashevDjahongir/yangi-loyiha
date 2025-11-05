@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: notes-backend
-        image: YOUR_DOCKERHUB_USERNAME/notes-backend:latest  # Jenkins push qilgan image
+        image: djahongir/notes-backend:latest  # Jenkins push qilgan image
         ports:
         - containerPort: 5000
         env:
