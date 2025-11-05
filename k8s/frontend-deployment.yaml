@@ -15,6 +15,7 @@ spec:
       containers:
       - name: notes-frontend
         image: djahongir/notes-frontend:latest
+        imagePullPolicy: Always 
         ports:
         - containerPort: 80
         # Agar frontend ichidan backendga host orqali murojaat qilish kerak bo'lsa,
