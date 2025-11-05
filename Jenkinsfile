@@ -42,9 +42,9 @@ pipeline {
         stage('Deploy to K8s') {
             steps {
                 withEnv(["KUBECONFIG=$KUBECONFIG"]) {
-                    sh 'kubectl apply -f k8s/mongo-deployment.yaml'
-                    sh 'kubectl apply -f k8s/backend-deployment.yaml'
-                    sh 'kubectl apply -f k8s/frontend-deployment.yaml'
+                    sh 'kubectl replace -f k8s/mongo-deployment.yaml'
+                    sh 'kubectl replace -f k8s/backend-deployment.yaml'
+                    sh 'kubectl replace -f k8s/frontend-deployment.yaml'
                 }
             }
         }
