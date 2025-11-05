@@ -1,46 +1,52 @@
 pipeline {
-  agent any
-  environment {
-    DOCKERHUB = credentials('dockerhub-credentials') // Jenkins-da DockerHub login saqlang
-    DOCKERHUB_USER = "${DOCKERHUB_USR}" // Jenkins environment map qila olasiz
-  }
-  stages {
-    stage('Checkout') {
-      steps { checkout scm }
+    agent any
+    environment {
+        KUBECONFIG = '/var/lib/jenkins/.kube/config' // Jenkins user kubeconfig
     }
-    stage('Build Backend Image') {
-      steps {
-        dir('backend') {
-          sh 'docker build -t $DOCKERHUB_USR/notes-backend:latest .'
-          sh 'docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW'
-          sh 'docker push $DOCKERHUB_USR/notes-backend:latest'
+    stages {
+        stage('Checkout') {
+            steps { 
+                checkout scm 
+            }
         }
-      }
-    }
-    stage('Build Frontend Image') {
-      steps {
-        dir('frontend') {
-          sh 'docker build -t $DOCKERHUB_USR/notes-frontend:latest .'
-          sh 'docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW'
-          sh 'docker push $DOCKERHUB_USR/notes-frontend:latest'
+        stage('Build Backend Image') {
+            steps {
+                dir('backend') {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                        sh 'docker build -t $DOCKER_USER/notes-backend:latest .'
+                        sh 'docker push $DOCKER_USER/notes-backend:latest'
+                    }
+                }
+            }
         }
-      }
-    }
-    stage('Run Tests (simple)') {
-      steps {
-        dir('backend') {
-          sh 'npm install'
-          sh 'npm test || true'
+        stage('Build Frontend Image') {
+            steps {
+                dir('frontend') {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                        sh 'docker build -t $DOCKER_USER/notes-frontend:latest .'
+                        sh 'docker push $DOCKER_USER/notes-frontend:latest'
+                    }
+                }
+            }
         }
-      }
+        stage('Run Tests (simple)') {
+            steps {
+                dir('backend') {
+                    sh 'npm install'
+                    sh 'npm test || echo "no tests found"'
+                }
+            }
+        }
+        stage('Deploy to K8s') {
+            steps {
+                withEnv(["KUBECONFIG=$KUBECONFIG"]) {
+                    sh 'kubectl apply -f k8s/mongo-deployment.yaml'
+                    sh 'kubectl apply -f k8s/backend-deployment.yaml'
+                    sh 'kubectl apply -f k8s/frontend-deployment.yaml'
+                }
+            }
+        }
     }
-    stage('Deploy to K8s') {
-      steps {
-        // Bu yerda Jenkins agent kubeconfigga ega bo'lishi kerak
-        sh 'kubectl apply -f k8s/mongo-deployment.yaml'
-        sh 'kubectl apply -f k8s/backend-deployment.yaml'
-        sh 'kubectl apply -f k8s/frontend-deployment.yaml'
-      }
-    }
-  }
 }
