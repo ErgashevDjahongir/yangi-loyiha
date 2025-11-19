@@ -1,4 +1,4 @@
-const api = (window.API_URL) ? window.API_URL : 'http://10.106.31.197:5000';
+const api = (window.API_URL) ? window.API_URL : 'http://10.10.114.231:5000';
 async function load(){
   const res = await fetch(`${api}/api/notes`);
   const items = await res.json();
