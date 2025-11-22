@@ -1,10 +1,10 @@
-aSAsASasconst express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.j1son());
 app.use(cors());
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://10.10.114.231:27017';
